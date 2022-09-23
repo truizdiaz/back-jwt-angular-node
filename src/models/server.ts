@@ -1,7 +1,8 @@
 import express, { Application } from 'express';
 import routesProduct from '../routes/product';
 import routesUser from '../routes/user';
-import sequelize from '../db/connection';
+import { Product } from './product';
+import { User } from './user';
 
 class Server {
     private app: Application;
@@ -34,8 +35,8 @@ class Server {
 
     async dbConnect() {
         try {
-            await sequelize.authenticate();
-            console.log('Connection has been established successfully.');
+            await Product.sync()
+            await User.sync();
         } catch (error) {
             console.error('Unable to connect to the database:', error);
         }

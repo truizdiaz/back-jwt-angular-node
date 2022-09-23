@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
+import { Product } from '../models/product';
 
-export const getProducts = (req: Request, res: Response) => {
+export const getProducts = async (req: Request, res: Response) => {
+    const listProducts = await Product.findAll();
 
-    res.json({
-        msg: "Get Productss"
-    })
+    res.json(listProducts)
 }
