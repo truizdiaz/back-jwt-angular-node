@@ -1,6 +1,7 @@
 import { Request, Response} from 'express';
 import bcrypt from 'bcrypt';
 import { User } from '../models/user';
+import jwt from 'jsonwebtoken';
 
 export const newUser = async (req: Request, res: Response) => {
 
@@ -33,18 +34,33 @@ export const newUser = async (req: Request, res: Response) => {
             error
         })
     }
-
-  
-
 }
 
-export const loginUser = (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response) => {
 
-    const { body } = req;
+    const { username, password } = req.body;
 
-    res.json({
-        msg: 'Login User',
-        body
+   // Validamos si el usuario existe en la base de datos
+   const user: any = await User.findOne({ where: { username: username } });
+
+   if(!user) {
+        return res.status(400).json({
+            msg: `No existe un usuario con el nombre ${username} en la base datos`
+        })
+   }
+
+   // Validamos password
+   const passwordValid = await bcrypt.compare(password, user.password)
+   if(!passwordValid) {
+    return res.status(400).json({
+        msg: `Password Incorrecta`
     })
+   }
 
+   // Generamos token
+   const token = jwt.sign({
+    username: username
+   }, process.env.SECRET_KEY || 'pepito123');
+   
+   res.json(token);
 }
