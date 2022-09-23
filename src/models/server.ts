@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import routesProduct from '../routes/product';
 import routesUser from '../routes/user';
+import sequelize from '../db/connection';
 
 class Server {
     private app: Application;
@@ -12,7 +13,8 @@ class Server {
         this.listen();
         this.midlewares();
         this.routes();
-      
+        this.dbConnect();
+
     }
 
     listen() {
@@ -28,6 +30,15 @@ class Server {
 
     midlewares() {
         this.app.use(express.json());
+    }
+
+    async dbConnect() {
+        try {
+            await sequelize.authenticate();
+            console.log('Connection has been established successfully.');
+        } catch (error) {
+            console.error('Unable to connect to the database:', error);
+        }
     }
 }
 
